@@ -27,6 +27,6 @@ jobs:
 
       - name: Cypress run
         env:
-          baseUrl: ${{ secrets.BASE_URL }}  # Define o baseUrl como variável de ambiente
+          baseUrl: 'http://localhost:5400'  # Define o baseUrl como variável de ambiente
         run: |
           npx cypress run --headless --browser chrome --spec "cypress/integration/*.spec.js"
