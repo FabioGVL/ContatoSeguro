@@ -28,32 +28,14 @@ jobs:
       - name: Return to project root
         run: |
           cd ..
-          cd cypress  # Entra na pasta cypress
-
+          
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16'  # ajustar conforme a versão do Node.js que você está utilizando
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Cache Cypress binary
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-cypress-
-
-      - name: Install Cypress
-        run: |
-          npx cypress install
-        env:
-          CYPRESS_INSTALL_BINARY: 0
-
-      - name: Grant execution permissions for Cypress
-        run: sudo chmod +x $(npm bin)/cypress
-
-      - name: Run Cypress tests
-        run: npm test  # ajustar conforme o comando npm utilizado para executar os testes Cypress
+      - uses: actions/checkout@v3
+      # Instala as dependências do Cypress
+      # Executa os testes com Cypress
+      - name: Cypress run
+        uses: cypress-io/github-action@v5
