@@ -19,23 +19,33 @@ jobs:
       - name: Start Docker services
         run: |
           cd Ambiente
-          docker-compose up -d
-          docker-compose ps
+          docker-compose up --build -d
           sleep 60  # Ajustar conforme necessário se os serviços demoram mais ou menos para iniciar
 
       - name: Wait for services to be ready
         run: sleep 30  # Ajustar conforme necessário para garantir que os serviços estejam completamente iniciados
+
+      - name: Return to project root
+        run: cd ..
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16'  # ajustar conforme a versão do Node.js que você está utilizando
 
-      - name: Return to project root
-        run: cd ..
-
       - name: Install dependencies
         run: npm install
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
+
+      - name: Install Cypress
+        run: npx cypress install
 
       - name: Grant execution permissions for Cypress
         run: chmod +x ./node_modules/.bin/cypress
