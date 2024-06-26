@@ -17,11 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker Compose
-        run: |
-          sudo docker-compose up --build -d  # Constrói e inicia os containers Docker em segundo plano
-          sleep 10  # Aguarda um momento para que o servidor Docker seja iniciado completamente
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
@@ -30,12 +25,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Start Docker containers
+        run: |
+          cd Ambiente  # Navega para o diretório onde está o docker-compose.yml
+          sudo docker-compose up --build -d
+
       - name: Cypress run
         env:
           baseUrl: 'http://localhost:5400'  # Define o baseUrl como variável de ambiente
         run: |
           npx cypress run --headless --browser chrome --spec "cypress/integration/*.spec.js"
-      
-      - name: Tear down Docker Compose
-        run: |
-          sudo docker-compose down  # Encerra os containers Docker
