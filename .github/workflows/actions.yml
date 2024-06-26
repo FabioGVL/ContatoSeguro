@@ -12,44 +12,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0.32
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3400:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      backend:
-        image: teste_qa_jr-backend  # ajustado para o nome correto da imagem Docker
-        ports:
-          - 8400:80
-        volumes:
-          - ./backend:/var/www/html
-        depends-on:
-          - mysql
-        options: --health-cmd="curl --silent --fail localhost:80 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      frontend:
-        image: node:16.20.1-alpine
-        ports:
-          - 5400:3000
-        volumes:
-          - ./frontend:/app
-        depends-on:
-          - backend
-        options: --health-cmd="curl --silent --fail localhost:3000 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Wait for services to be healthy
+      - name: Start Docker services
         run: |
-          docker-compose -f docker-compose.yml up -d
-          docker-compose -f docker-compose.yml ps
+          cd Ambiente
+          docker-compose up -d
+          docker-compose ps
           sleep 60  # Ajustar conforme necessário se os serviços demoram mais ou menos para iniciar
+
+      - name: Wait for services to be ready
+        run: sleep 30  # Ajustar conforme necessário para garantir que os serviços estejam completamente iniciados
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
