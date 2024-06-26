@@ -20,10 +20,12 @@ jobs:
         run: |
           cd Ambiente
           docker-compose up --build -d
-          sleep 60  # Ajustar conforme necessário se os serviços demoram mais ou menos para iniciar
+          sleep 60   
 
       - name: Wait for services to be ready
-        run: sleep 120  # Ajustar conforme necessário para garantir que os serviços estejam completamente iniciados
+        run: |
+            sleep 120
+            docker-compose ps
 
       - name: Return to project root
         run: |
