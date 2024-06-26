@@ -12,22 +12,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      backend:
-        image: your-backend-image:tag  # substitua com o nome e tag da sua imagem Docker do backend
-        ports:
-          - 8400:8400  # ajuste conforme a porta usada pelo seu backend
-        options: --name backend
-
-      frontend:
-        image: your-frontend-image:tag  # substitua com o nome e tag da sua imagem Docker do frontend
-        ports:
-          - 5400:5400  # ajuste para a porta 5400
-        options: --name frontend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Navigate to Ambiente directory
+        run: cd Ambiente
+
+      - name: Start Docker Compose
+        run: docker-compose up --build -d
+
+      - name: Wait for server to start
+        run: sleep 60  # ajuste conforme necessário, aqui estamos aguardando 60 segundos
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
