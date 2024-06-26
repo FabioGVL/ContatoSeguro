@@ -35,5 +35,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Grant execution permissions for Cypress
+        run: |
+          npx cypress verify
+          chmod +x ./node_modules/.bin/cypress
+
       - name: Run Cypress tests
         run: npm test  # ajustar conforme o comando npm utilizado para executar os testes Cypress
