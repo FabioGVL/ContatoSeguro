@@ -1,41 +1,41 @@
-name: End-to-End Tests
+name: Cypress End-to-End Tests
 
 on:
   push:
     branches:
-      - main
+      - main  # ajuste conforme o nome da sua branch principal
   pull_request:
     branches:
-      - main
-  workflow_dispatch:  # Isso permite o acionamento manual do workflow
+      - main  # ajuste conforme o nome da sua branch principal
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      backend:
+        image: your-backend-image:tag  # substitua com o nome e tag da sua imagem Docker do backend
+        ports:
+          - 8400:8400  # ajuste conforme a porta usada pelo seu backend
+        options: --name backend
+
+      frontend:
+        image: your-frontend-image:tag  # substitua com o nome e tag da sua imagem Docker do frontend
+        ports:
+          - 5400:5400  # ajuste para a porta 5400
+        options: --name frontend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      #- name: Set up Docker Compose
-       # run: |
-         # sudo docker-compose up --build -d  # Constrói e inicia os containers Docker em segundo plano
-          #sleep 10  # Aguarda um momento para que o servidor Docker seja iniciado completamente
-
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '16'  # ajuste conforme a versão do Node.js que você está utilizando
 
       - name: Install dependencies
         run: npm install
 
-      - name: Cypress run
-        env:
-          baseUrl: 'http://localhost:5400:3000'  # Define o baseUrl como variável de ambiente
-        run: |
-          npx cypress run --headless --browser chrome --spec "cypress/integration/*.spec.js"
-      
-      #- name: Tear down Docker Compose
-        #run: |
-         # sudo docker-compose down  # Encerra os containers Docker
+      - name: Run Cypress tests
+        run: npm run cypress:run  # ajuste conforme o comando npm utilizado para executar os testes Cypress
