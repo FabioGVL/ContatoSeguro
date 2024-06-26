@@ -1,4 +1,4 @@
-name: Cypress End-to-End Tests
+name: End-to-End Tests with Cypress
 
 on:
   push:
@@ -12,26 +12,52 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0.32
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3400:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      backend:
+        image: teste_qa_jr-backend  # ajustado para o nome correto da imagem Docker
+        ports:
+          - 8400:80
+        volumes:
+          - ./backend:/var/www/html
+        depends-on:
+          - mysql
+        options: --health-cmd="curl --silent --fail localhost:80 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      frontend:
+        image: node:16.20.1-alpine
+        ports:
+          - 5400:3000
+        volumes:
+          - ./frontend:/app
+        depends-on:
+          - backend
+        options: --health-cmd="curl --silent --fail localhost:3000 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Navigate to Ambiente directory
-        run: cd Ambiente
-
-      - name: Start Docker Compose
-        run: docker-compose up --build -d
-
-      - name: Wait for server to start
-        run: sleep 60  # ajuste conforme necessário, aqui estamos aguardando 60 segundos
+      - name: Wait for services to be healthy
+        run: |
+          docker-compose -f docker-compose.yml up -d
+          docker-compose -f docker-compose.yml ps
+          sleep 60  # Ajustar conforme necessário se os serviços demoram mais ou menos para iniciar
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # ajuste conforme a versão do Node.js que você está utilizando
+          node-version: '16'  # ajustar conforme a versão do Node.js que você está utilizando
 
       - name: Install dependencies
         run: npm install
 
       - name: Run Cypress tests
-        run: npm run cypress:run  # ajuste conforme o comando npm utilizado para executar os testes Cypress
+        run: npm run cypress:run  # ajustar conforme o comando npm utilizado para executar os testes Cypress
