@@ -20,12 +20,8 @@ jobs:
         run: |
           cd Ambiente
           docker-compose up -d
-          sleep 60   
-
-      - name: Wait for services to be ready
-        run: |
-            sleep 120
-            docker-compose ps
+          sleep 180             
+          docker-compose ps
 
       - name: Return to project root
         run: |
