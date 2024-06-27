@@ -3,18 +3,25 @@ name: End-to-End Tests with Cypress
 on:
   push:
     branches:
-      - main  # ajuste conforme o nome da sua branch principal
+      - main
   pull_request:
     branches:
-      - main  # ajuste conforme o nome da sua branch principal
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Setup Docker Compose
+        run: |
+          sudo rm /usr/local/bin/docker-compose
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
       - name: Start Docker services with build
         run: |
@@ -22,11 +29,6 @@ jobs:
           docker-compose up --build -d
           sleep 200
           docker-compose ps
-
-      - name: Check frontend container logs
-        run: |
-          cd Ambiente
-          docker-compose logs frontend
 
       - name: Return to project root
         run: |
@@ -37,14 +39,10 @@ jobs:
         with:
           node-version: '16'
 
-      - uses: actions/checkout@v3
-
-      - name: Restart Docker services without build
+      - name: Status Ambiente
         run: |
           cd Ambiente
-          docker-compose down
-          docker-compose up -d
-          sleep 200
+          sleep 60
           docker-compose ps
 
       - name: Cypress run
