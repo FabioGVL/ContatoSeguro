@@ -16,11 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Start Docker services
+      - name: Start Docker services with build
         run: |
           cd Ambiente
-          docker-compose up -d
-          sleep 240  
+          docker-compose up --build -d
+          sleep 200
           docker-compose ps
 
       - name: Check frontend container logs
@@ -35,9 +35,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  
+          node-version: '16'
 
       - uses: actions/checkout@v3
+
+      - name: Restart Docker services without build
+        run: |
+          cd Ambiente
+          docker-compose down
+          docker-compose up -d
+          sleep 200
+          docker-compose ps
 
       - name: Cypress run
         uses: cypress-io/github-action@v5
