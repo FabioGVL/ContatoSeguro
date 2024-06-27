@@ -20,20 +20,29 @@ jobs:
         run: |
           cd Ambiente
           docker-compose up -d
-          sleep 180             
+          sleep 240  
           docker-compose ps
+
+      - name: Check frontend container logs
+        run: |
+          cd Ambiente
+          docker-compose logs frontend
 
       - name: Return to project root
         run: |
           cd ..
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # ajustar conforme a versão do Node.js que você está utilizando
+          node-version: '16'  
 
       - uses: actions/checkout@v3
-      # Instala as dependências do Cypress
-      # Executa os testes com Cypress
+
       - name: Cypress run
         uses: cypress-io/github-action@v5
+
+      - name: Stop Docker services
+        run: |
+          cd Ambiente
+          docker-compose down
